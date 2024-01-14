@@ -39,5 +39,7 @@ Route::controller(App\Http\Controllers\FeatureController::class)->group(function
     });
     Route::post('/detail/{id}', 'pinjam')->middleware('auth');
     Route::post('/cancel/{id}', 'cancel');
+    Route::post('/kembali/{id}', 'kembali');
+    Route::post('/perpanjang/{id}', 'perpanjang_peminjaman');
     Route::get('/baca/{id}', 'read');
 });

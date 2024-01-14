@@ -21,7 +21,7 @@ class BookFactory extends Factory
             'author' => fake()->name(),
             'content' => fake()->paragraphs(20, true),
             'description' => fake()->sentences(rand(10,15), true),
-            'cover' => '/storage/noimage.jfif',
+            'cover' => 'image/noimage.jfif',
             'stock' => rand(2,15),
         ];
     }

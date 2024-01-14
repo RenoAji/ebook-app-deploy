@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\Book;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Carbon;  
 
 class FeatureController extends Controller
 {
@@ -16,13 +17,17 @@ class FeatureController extends Controller
             $request->session()->flash('alert', ['message' => 'Anda sudah meminjam buku ini', 'status' => 'warning']);
             return redirect('/peminjaman');
         }
+        if($peminjaman->count() >= 5){
+            $request->session()->flash('alert', ['message' => 'Anda hanya bisa meminjam buku sejumlah maksimal 5', 'status' => 'warning']);
+            return redirect('/peminjaman');
+        }
 
         $pinjam = Peminjaman::create([
             'user_id' => auth()->user()->id,
             'book_id' => $id,
         ]);
 
-        if($pinjam > 0){
+        if($pinjam){
             $request->session()->flash('alert', ['message' => 'Peminjaman Berhasil', 'status' => 'success']);
         }
         return redirect('/peminjaman');
@@ -42,7 +47,8 @@ class FeatureController extends Controller
         //->update(['is_confirmed' => true, 'confirmed_at' => date("Y-m-d H:i:s")])
         $peminjaman = Peminjaman::find($id);
         $peminjaman->is_confirmed = true;
-        $peminjaman->confirmed_at = date("Y-m-d H:i:s");
+        $peminjaman->confirmed_at = Carbon::now();
+        $peminjaman->expired_at = Carbon::now()->addWeeks(2)->endOfDay();
         $peminjaman->save();
 
         if($peminjaman){
@@ -92,5 +98,26 @@ class FeatureController extends Controller
         $book = $peminjaman->book;
 
         return view('read', ['book' => $book]);
+    }
+
+    public function perpanjang_peminjaman(Request $request,$id){
+        $peminjaman = Peminjaman::find($id);
+        $peminjaman->is_confirmed = false;
+        $peminjaman->confirmed_at = null;
+        $peminjaman->expired_at = null;
+
+        $peminjaman->save();
+        $request->session()->flash('alert', ['message' => 'Perpanjangan peminjaman sudah dilakukan, Tunggu persetujuan dari admin', 'status' => 'success']);
+        return redirect('/peminjaman');
+    }
+
+    public function kembali(Request $request,$id){
+        $peminjaman = Peminjaman::find($id);
+        $peminjaman->book->increment('stock');
+
+        $peminjaman->delete();
+        $request->session()->flash('alert', ['message' => 'Buku sudah dikembalikan', 'status' => 'success']);
+        return redirect('/peminjaman');
+
     }
 }

@@ -23,21 +23,20 @@ class PageController extends Controller
 
     public function peminjaman(){
         if(Gate::denies('admin')){
-            $confirmed = Peminjaman::where('user_id', auth()->user()->id)->where('is_confirmed',true)->whereDate('confirmed_at', '>', Carbon::now()->subWeeks(2)->startOfDay())->get();
+            $confirmed = Peminjaman::where('user_id', auth()->user()->id)->where('is_confirmed',true)->whereDate('expired_at', '>=', Carbon::now())->get();
             $notConfirmed = Peminjaman::where('user_id', auth()->user()->id)->where('is_confirmed',false)->get();
-            Log::info(auth()->user()->id);
-            //Log::info(var_dump($peminjamanUser));
-            Log::info($confirmed);
-            Log::info($notConfirmed);
-            return view('peminjaman',['confirmed' => $confirmed, 'notConfirmed' => $notConfirmed]);
+            $expired = Peminjaman::where('user_id', auth()->user()->id)->where('is_confirmed',true)->whereDate('expired_at', '<', Carbon::now())->get();
+
+            return view('peminjaman',['confirmed' => $confirmed, 'notConfirmed' => $notConfirmed, 'expired' => $expired]);
         }
 
         if(Gate::allows('admin')){
-            $confirmed = Peminjaman::where('is_confirmed',true)->whereDate('confirmed_at', '>=', Carbon::now()->subWeeks(2))->get();
+            $confirmed = Peminjaman::where('is_confirmed',true)->whereDate('expired_at', '>=', Carbon::now())->get();
             $notConfirmed = Peminjaman::where('is_confirmed',false)->get();
-            Log::info($confirmed);
-            Log::info($notConfirmed);
-            return view('peminjaman',['confirmed' => $confirmed, 'notConfirmed' => $notConfirmed]);
+            $expired = Peminjaman::where('is_confirmed',true)->whereDate('expired_at', '<', Carbon::now())->get();
+
+
+            return view('peminjaman',['confirmed' => $confirmed, 'notConfirmed' => $notConfirmed, 'expired' => $expired]);
         }
 
     }

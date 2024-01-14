@@ -31,8 +31,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('read', function (User $user, Peminjaman $peminjaman) {
             $user_match = $user->id == $peminjaman->user_id ;
-            $expired_dt = (new Carbon($peminjaman->confirmed_at))->addWeeks(2)->endOfDay();
-            $peminjaman_valid= $expired_dt > Carbon::now();
+            $peminjaman_valid= new Carbon($peminjaman->expired_at) >= Carbon::now();
 
             return $user_match && $peminjaman_valid;
         });

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('book_id')->constrained();
             $table->boolean('is_confirmed')->default(false);
             $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });
     }
