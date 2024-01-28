@@ -7,21 +7,21 @@ use App\Models\Peminjaman;
 use App\Models\Book;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Carbon;  
+use Illuminate\Support\Facades\Log;
 
 class FeatureController extends Controller
 {
     public function pinjam(Request $request, $id){
-
         $peminjaman = Peminjaman::where('user_id',auth()->user()->id)->where('book_id',$id);
         if ($peminjaman->exists()) {
             $request->session()->flash('alert', ['message' => 'Anda sudah meminjam buku ini', 'status' => 'warning']);
             return redirect('/peminjaman');
         }
-        if($peminjaman->count() >= 5){
+        if(Peminjaman::where('user_id',auth()->user()->id)->count() >= 5){
             $request->session()->flash('alert', ['message' => 'Anda hanya bisa meminjam buku sejumlah maksimal 5', 'status' => 'warning']);
             return redirect('/peminjaman');
         }
-
+        
         $pinjam = Peminjaman::create([
             'user_id' => auth()->user()->id,
             'book_id' => $id,
@@ -50,6 +50,8 @@ class FeatureController extends Controller
         $peminjaman->confirmed_at = Carbon::now();
         $peminjaman->expired_at = Carbon::now()->addWeeks(2)->endOfDay();
         $peminjaman->save();
+
+        $peminjaman->book->decrement('stock');
 
         if($peminjaman){
             $request->session()->flash('alert', ['message' => 'Peminjaman dikonfirmasi', 'status' => 'success']);

@@ -21,7 +21,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li>
-                  <form action="logout" method="post">
+                  <form action="/logout" method="post">
                     @csrf
                     <button type="submit">Logout</button>
                   </form>
