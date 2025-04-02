@@ -11,7 +11,7 @@
 <div class="container mt-4 d-flex flex-wrap">
     @foreach ($books as $book )
     <div class="card m-3" style="width: 18rem;">
-        <img src="{{asset('storage/'.$book->cover)}}" class="card-img-top" alt="...">
+        <img src="{{asset('storage/'.$book->cover)}}" class="card-img-top" alt="Book Cover">
         <div class="card-body">
         <h5 class="card-title">{{$book->title}}</h5>
         <p class="card-text">Author : {{$book->author}}</p>

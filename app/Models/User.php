@@ -24,7 +24,7 @@ class User extends Authenticatable
     //     'password',
     // ];
     protected $guarded = [
-        'id','is_admin'
+        'id'
     ];
 
     /**
